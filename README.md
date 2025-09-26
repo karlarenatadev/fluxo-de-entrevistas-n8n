@@ -5,21 +5,21 @@ Este é um fluxo de trabalho (workflow) do n8n projetado para automatizar a tria
 ## 🚀 Funcionalidades Principais
 Este fluxo realiza as seguintes etapas de forma automática:
 
-Coleta de Dados: Recebe candidaturas através de um formulário da web nativo do n8n.
+1. Coleta de Dados: Recebe candidaturas através de um formulário da web nativo do n8n.
 
-Triagem Salarial: Verifica se a Pretensão Salarial é superior a um valor limite (R$ 5.000,00 neste caso).
+2. Triagem Salarial: Verifica se a Pretensão Salarial é superior a um valor limite (R$ 5.000,00 neste caso).
 
-Se for superior, envia um e-mail de rejeição educado, informando a incompatibilidade financeira.
+* Se for superior, envia um e-mail de rejeição educado, informando a incompatibilidade financeira.
 
-Se for igual ou inferior, a candidatura é aprovada para a próxima etapa.
+* Se for igual ou inferior, a candidatura é aprovada para a próxima etapa.
 
-Registro de Candidato: Salva os dados do candidato (Nome, Email, Cargo, Pretensão e Data) em uma planilha do Google Sheets.
+3. Registro de Candidato: Salva os dados do candidato (Nome, Email, Cargo, Pretensão e Data) em uma planilha do Google Sheets.
 
-Notificação de Aprovação: Envia um e-mail de aprovação para o candidato, indicando que ele avançou no processo.
+4. Notificação de Aprovação: Envia um e-mail de aprovação para o candidato, indicando que ele avançou no processo.
 
-Notificação de Gestor: Envia um e-mail para o gestor responsável (ou RH) com os detalhes do novo candidato.
+5. Notificação de Gestor: Envia um e-mail para o gestor responsável (ou RH) com os detalhes do novo candidato.
 
-Agendamento Automático (Opcional): Para candidatos com pretensão salarial abaixo de um segundo valor (R$ 4.000,00), o fluxo agenda automaticamente uma entrevista no Google Calendar e envia o link para o candidato e o gestor.
+6. Agendamento Automático (Opcional): Para candidatos com pretensão salarial abaixo de um segundo valor (R$ 4.000,00), o fluxo agenda automaticamente uma entrevista no Google Calendar e envia o link para o candidato e o gestor.
 
 ## 🧱 Estrutura do Workflow
 
@@ -36,17 +36,16 @@ Agendamento Automático (Opcional): Para candidatos com pretensão salarial abai
 | **Gmail** | `email entrevista` | Envia o e-mail de confirmação da entrevista (para candidato e gestor). |
 | **Gmail** | `email para gestor` | Notifica o gestor sobre o novo candidato registrado. |
 
-## Exportar para as Planilhas
 ## ⚙️ Pré-Requisitos e Configuração
 Para utilizar este fluxo, você precisará configurar as seguintes credenciais e recursos:
 
 ## Credenciais do n8n:
 
-Gmail OAuth2: Para enviar e-mails de aprovação, rejeição e agendamento.
+* Gmail OAuth2: Para enviar e-mails de aprovação, rejeição e agendamento.
 
-Google Sheets OAuth2 API: Para ler e escrever dados na planilha de candidatos.
+* Google Sheets OAuth2 API: Para ler e escrever dados na planilha de candidatos.
 
-Google Calendar OAuth2 API: Para agendar as entrevistas.
+* Google Calendar OAuth2 API: Para agendar as entrevistas.
 
 ## Planilha do Google Sheets:
 
