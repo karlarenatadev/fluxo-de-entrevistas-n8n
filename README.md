@@ -39,7 +39,7 @@ Este fluxo realiza as seguintes etapas de forma automática:
 ## ⚙️ Pré-Requisitos e Configuração
 Para utilizar este fluxo, você precisará configurar as seguintes credenciais e recursos:
 
-## Credenciais do n8n:
+### Credenciais do n8n:
 
 * Gmail OAuth2: Para enviar e-mails de aprovação, rejeição e agendamento.
 
@@ -47,13 +47,13 @@ Para utilizar este fluxo, você precisará configurar as seguintes credenciais e
 
 * Google Calendar OAuth2 API: Para agendar as entrevistas.
 
-## Planilha do Google Sheets:
+### Planilha do Google Sheets:
 
 Crie uma planilha com as colunas: Nome, Email, Cargo, Pretensão, Data Cadastro, Entrevista.
 
 No nó cadastrar usuário na planilha, substitua o Document ID e o Sheet Name pelos dados da sua planilha.
 
-## E-mails e Regras:
+### E-mails e Regras:
 
 No nó Salário Alto Email, personalize o e-mail de rejeição e a assinatura.
 
