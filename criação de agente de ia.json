@@ -1,0 +1,247 @@
+{
+  "name": "criação de agente de ia",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "f8c1e7a5-ecd4-49bb-9cc6-2c4f4223ab80",
+      "name": "When chat message received",
+      "webhookId": "c9ac02e1-830d-4efb-84d1-e2ccf67b7304"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=Você é Alex, um agente de atendimento virtual. Seu tom é sempre educado, prestativo e paciente.\n\nSeu objetivo é responder às dúvidas dos clientes de forma clara e direta, seguindo as regras abaixo.\n\nSiga estas regras estritamente:\n\nBaseie suas respostas APENAS nas informações a seguir:\n\nTrocas: O prazo para trocas é de 30 dias após o recebimento.\n\nDevoluções: O prazo para devoluções é de 7 dias após o recebimento.\n\nEntrega: O código de rastreio é enviado por e-mail em até 24 horas úteis. O prazo de entrega é de 5 a 10 dias úteis.\n\nSenha: Para redefinir a senha, o cliente deve acessar o site, clicar em \"Login\" e depois em \"Esqueci minha senha\".\n\nNUNCA invente informações. Não prometa nada que não esteja nas regras acima.\n\nSe você não souber a resposta ou se o cliente pedir para falar com uma pessoa, diga exatamente isto: \"Entendi. Para te ajudar melhor com isso, vou te transferir para um de nossos especialistas humanos. Por favor, aguarde.\"\n\n1.  **Saudação:** Cumprimente o cliente e se apresente como \"Alex, assistente virtual\".\n2.  **Entendimento:** Pergunte como pode ajudar.\n3.  **Solução:** Use as regras acima para dar uma resposta direta.\n4.  **Finalização:** Pergunte se pode ajudar com mais alguma coisa e, se não, despeça-se cordialmente."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "88e87ca6-754f-4b12-a442-532724f8bff6",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        112,
+        176
+      ],
+      "id": "68f9c45a-6456-4b11-9794-46df9d58d726",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "SYYFCSdYwKBY7dK2",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        256
+      ],
+      "id": "d13018b0-8391-41d9-9094-6ef0ef8fb318",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Esta tool serve para consultar banco de dados",
+        "operation": "getAll",
+        "tableId": "products",
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        352,
+        352
+      ],
+      "id": "bdb02b48-f2e5-4b55-865e-97c470e1f00f",
+      "name": "consultar produtos",
+      "credentials": {
+        "supabaseApi": {
+          "id": "3Q4dz5mYghlUDV4E",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "products",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $fromAI('id', `Envie o id como valor numerico`, 'string') }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "stock_quantity",
+              "fieldValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fieldValues0_Field_Value', ``, 'string') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        496,
+        352
+      ],
+      "id": "e80b3ea0-4fba-4017-bb3e-1165da77cc51",
+      "name": "Atualizacao de estoque",
+      "credentials": {
+        "supabaseApi": {
+          "id": "3Q4dz5mYghlUDV4E",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "products",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $fromAI('nome',`O nome do produto`, 'string') }}"
+            },
+            {
+              "fieldId": "description",
+              "fieldValue": "={{ $fromAI('description', `A descricao do produto`, 'string') }}"
+            },
+            {
+              "fieldId": "stock_quantity",
+              "fieldValue": "={{ $fromAI('stock_quantity', `Estoque do produto`, 'string') }}"
+            },
+            {
+              "fieldId": "category",
+              "fieldValue": "={{ $fromAI('category', `Categoria do produto`, 'string') }}"
+            },
+            {
+              "fieldId": "price",
+              "fieldValue": "={{ $fromAI('price', `Preco do produto`, 'string') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        640,
+        352
+      ],
+      "id": "1defe79c-fd61-4f5a-bb88-c4d31fed27aa",
+      "name": "criar produto",
+      "credentials": {
+        "supabaseApi": {
+          "id": "3Q4dz5mYghlUDV4E",
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "consultar produtos": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Atualizacao de estoque": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "criar produto": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "3692aa63-adf3-40c4-a081-5bcb119f77ea",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ac9a7b57012e6e040db968e4dc320f11d842a3503838e0caf427ab441f357ca3"
+  },
+  "id": "eYiRrpxy5PDgRFCS",
+  "tags": []
+}
