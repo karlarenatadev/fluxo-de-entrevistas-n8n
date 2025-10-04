@@ -1,74 +1,90 @@
-# fluxo-de-entrevistas-n8n
-📄 Fluxo de Entrevistas Automatizado - n8n Workflow
-Este é um fluxo de trabalho (workflow) do n8n projetado para automatizar a triagem inicial de candidaturas para vagas de emprego. Ele gerencia todo o processo, desde a coleta de dados via formulário até a tomada de decisão automática de salário e a notificação dos próximos passos.
+# 📄 Fluxo de Entrevistas Automatizado com n8n
 
-🚀 Funcionalidades Principais
-Este fluxo realiza as seguintes etapas de forma automática:
+[![Licença: MIT](https://img.shields.io/badge/Licen%C3%A7a-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Coleta de Dados: Recebe candidaturas através de um formulário da web nativo do n8n.
+Este repositório contém um workflow completo para a plataforma de automação **n8n**, projetado para automatizar e otimizar o processo de triagem inicial de candidatos a vagas de emprego. O fluxo gerencia de forma inteligente todo o ciclo, desde a captura de dados de um formulário web até a tomada de decisões com base em critérios salariais, registro em planilhas, agendamento de entrevistas e comunicação com candidatos e gestores.
 
-Triagem Salarial: Verifica se a Pretensão Salarial é superior a um valor limite (R$ 5.000,00 neste caso).
+## 🚀 Funcionalidades Principais
 
-Se for superior, envia um e-mail de rejeição educado, informando a incompatibilidade financeira.
+Este workflow automatiza as seguintes etapas do processo seletivo:
 
-Se for igual ou inferior, a candidatura é aprovada para a próxima etapa.
+-   **Coleta de Dados Centralizada**: Recebe e organiza as candidaturas através de um formulário web customizável, gerado diretamente no n8n.
+-   **Triagem Salarial Inteligente**: Avalia a pretensão salarial do candidato em relação a um teto pré-definido (neste fluxo, R$ 5.000,00).
+    -   **Rejeição Automática**: Se a pretensão for superior ao limite, um e-mail formal e educado é enviado ao candidato, informando a incompatibilidade financeira e mantendo uma boa experiência do candidato.
+    -   **Aprovação para Próxima Etapa**: Se a pretensão for compatível, o fluxo prossegue para as próximas fases.
+-   **Registro Automatizado de Candidatos**: Armazena os dados dos candidatos aprovados (Nome, Email, Cargo, Pretensão Salarial e Data) em uma planilha do Google Sheets, criando um banco de talentos organizado.
+-   **Comunicação Padronizada**:
+    -   **Notificação de Aprovação**: Envia um e-mail para o candidato, confirmando que ele avançou no processo seletivo.
+    -   **Alerta para o Gestor**: Notifica o gestor ou o RH sobre a nova candidatura, enviando os detalhes do candidato para análise.
+-   **Agendamento Automático de Entrevistas**: Para candidatos com pretensão salarial abaixo de um segundo valor de corte (R$ 4.000,00), o workflow:
+    -   Cria um evento no Google Calendar.
+    -   Convida o candidato e o gestor para a entrevista.
+    -   Atualiza a planilha do Google Sheets com o link da videochamada.
+    -   Envia um e-mail de confirmação do agendamento para todas as partes envolvidas.
 
-Registro de Candidato: Salva os dados do candidato (Nome, Email, Cargo, Pretensão e Data) em uma planilha do Google Sheets.
+## 🧱 Estrutura do Workflow
 
-Notificação de Aprovação: Envia um e-mail de aprovação para o candidato, indicando que ele avançou no processo.
+O fluxo de trabalho é composto pelos seguintes nós (nodes), orquestrados para executar o processo de forma lógica e eficiente:
 
-Notificação de Gestor: Envia um e-mail para o gestor responsável (ou RH) com os detalhes do novo candidato.
+| Nó (Node)              | Nome no Fluxo                  | Função                                                                                                                    |
+| ---------------------- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| **Form Trigger** | `Quando receber candidatura`   | Cria um formulário web para receber os dados dos candidatos (Nome, Telefone, Email, Função, Pretensão Salarial).            |
+| **IF** | `Verifica salário`             | Bifurca o fluxo com base na pretensão salarial (maior que R$ 5.000,00).                                                    |
+| **Gmail** | `Salário Alto Email`           | Envia o e-mail de rejeição para candidatos com pretensão salarial acima do teto.                                          |
+| **Google Sheets** | `cadastrar usuário na planilha`| Adiciona os dados do candidato aprovado a uma nova linha na planilha de controle.                                         |
+| **Switch** | `Verifica cargo`               | Direciona o fluxo com base no cargo selecionado pelo candidato (Programador, Analista de Dados, etc.).                      |
+| **Gmail** | `Email para dev`, `emial para AD`, etc. | Envia um e-mail de aprovação personalizado, informando que o candidato avançou para a próxima fase.                |
+| **Filter** | `FIltro de salário`            | Filtra os candidatos aprovados cuja pretensão salarial é inferior a R$ 4.000,00 para o agendamento automático.             |
+| **Google Calendar** | `Agendar entrevista`           | Agenda a entrevista no Google Calendar, convidando o candidato e o gestor.                                                |
+| **Google Sheets** | `colocar link da entrevista`   | Atualiza a linha do candidato na planilha com o link da entrevista agendada.                                              |
+| **Gmail** | `email entrevista`             | Envia um e-mail de confirmação do agendamento com o link da videochamada para o candidato e o gestor.                       |
+| **Gmail** | `email para gestor`            | Notifica o gestor sobre o novo candidato registrado na planilha para que ele possa dar continuidade ao processo.           |
 
-Agendamento Automático (Opcional): Para candidatos com pretensão salarial abaixo de um segundo valor (R$ 4.000,00), o fluxo agenda automaticamente uma entrevista no Google Calendar e envia o link para o candidato e o gestor.
+## ⚙️ Pré-requisitos e Configuração
 
-🧱 Estrutura do Workflow
-Nó (Node)	Nome no Fluxo	Função
-Form Trigger	Quando receber candidatura	Gatilho inicial. Cria um formulário web para receber os dados do candidato.
-IF	Verifica salário	Decide o caminho a seguir: Aprovado ou Rejeitado (com base em Pretensão Salarial > R$ 5000).
-Google Sheets	cadastrar usuário na planilha	Adiciona o novo candidato à planilha de controle.
-Switch	Verifica cargo	Divide o fluxo em 5 caminhos, um para cada cargo, garantindo que o e-mail de aprovação seja enviado antes das próximas etapas.
-Gmail	Email para dev, emial para AD, etc.	Envia a mensagem de aprovação para o candidato.
-Filter	FIltro de salário	Filtra novamente os aprovados para agendamento (somente se Pretensão Salarial < R$ 4000).
-Google Calendar	Agendar entrevista	Cria o evento de entrevista automaticamente.
-Google Sheets	colocar link da entrevista	Atualiza a planilha de controle com o link do agendamento.
-Gmail	email entrevista	Envia o e-mail de confirmação da entrevista (para candidato e gestor).
-Gmail	email para gestor	Notifica o gestor sobre o novo candidato registrado.
+Para implementar este workflow em seu ambiente n8n, você precisará das seguintes credenciais e configurações:
 
-Exportar para as Planilhas
-⚙️ Pré-Requisitos e Configuração
-Para utilizar este fluxo, você precisará configurar as seguintes credenciais e recursos:
+### Credenciais do n8n
 
-Credenciais do n8n:
+Certifique-se de que suas credenciais OAuth2 para os seguintes serviços do Google estão configuradas em sua instância do n8n:
+-   **Gmail**: Para enviar os e-mails de aprovação, rejeição e agendamento.
+-   **Google Sheets**: Para ler e escrever dados na planilha de candidaturas.
+-   **Google Calendar**: Para criar os eventos de entrevista.
 
-Gmail OAuth2: Para enviar e-mails de aprovação, rejeição e agendamento.
+### Planilha do Google Sheets
 
-Google Sheets OAuth2 API: Para ler e escrever dados na planilha de candidatos.
+1.  Crie uma nova planilha no Google Sheets com as seguintes colunas:
+    -   `Nome`
+    -   `Email`
+    -   `Cargo`
+    -   `Pretensão`
+    -   `Data Cadastro`
+    -   `Entrevista`
+2.  No nó **`cadastrar usuário na planilha`**, atualize os campos `Document ID` e `Sheet Name` com os dados correspondentes da sua planilha.
 
-Google Calendar OAuth2 API: Para agendar as entrevistas.
+### Personalização do Fluxo
 
-Planilha do Google Sheets:
+-   **Valores de Triagem**:
+    -   No nó **`Verifica salário`**, ajuste o valor de corte (`5000`) conforme a política da sua empresa.
+    -   No nó **`FIltro de salário`**, altere o valor (`4000`) para definir o teto do agendamento automático de entrevistas.
+-   **Templates de E-mail**:
+    -   Personalize o conteúdo dos e-mails nos nós `Salário Alto Email`, `Email para dev`, `email entrevista`, etc., para adequá-los ao tom de voz da sua marca.
+-   **Destinatário do Gestor**:
+    -   No nó **`email para gestor`**, substitua o endereço `renatakarla663@gmail.com` pelo e-mail do responsável pelo processo seletivo (RH ou gestor da vaga).
 
-Crie uma planilha com as colunas: Nome, Email, Cargo, Pretensão, Data Cadastro, Entrevista.
+## 📥 Como Importar e Ativar o Workflow
 
-No nó cadastrar usuário na planilha, substitua o Document ID e o Sheet Name pelos dados da sua planilha.
+1.  Faça o download do arquivo `Fluxo de entrevistas.json` deste repositório.
+2.  Acesse o seu painel do n8n e vá para a seção "Workflows".
+3.  Clique em **"New"** e selecione a opção **"Import from JSON"**.
+4.  Cole o conteúdo do arquivo JSON na área indicada ou faça o upload do arquivo.
+5.  Siga os passos da seção de **Configuração** acima para ajustar o workflow às suas necessidades.
+6.  **ATIVE** o fluxo de trabalho no botão de toggle no canto superior esquerdo para que o formulário web comece a receber candidaturas.
 
-E-mails e Regras:
+## 🤝 Contribuições
 
-No nó Salário Alto Email, personalize o e-mail de rejeição e a assinatura.
+Contribuições são sempre bem-vindas! Se você tiver sugestões para melhorar este fluxo de trabalho, sinta-se à vontade para abrir uma *issue* ou enviar um *pull request*.
 
-No nó Verifica salário, você pode alterar o valor de corte de 5000 para outro.
+## 📜 Licença
 
-No nó FIltro de salário, você pode alterar o valor de 4000 usado para agendamento automático.
-
-No nó email para gestor, substitua o e-mail do gestor (renatakarla663@gmail.com) pelo e-mail correto do RH/Gestor.
-
-📥 Como Importar
-Baixe o arquivo Fluxo de entrevistas.json deste repositório.
-
-No seu painel do n8n, clique em "Workflows".
-
-Clique em "Novo" e selecione "Importar do JSON" (ou use Ctrl/Cmd + V se tiver copiado o conteúdo do arquivo).
-
-Configure as credenciais e planilhas conforme descrito acima.
-
-ATIVE o fluxo de trabalho (o botão "ON") para que o formulário comece a receber candidaturas.
+Este projeto é distribuído sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
